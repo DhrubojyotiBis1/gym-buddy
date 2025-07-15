@@ -1,0 +1,53 @@
+version: '3.8'
+
+services:
+  # Authentication Service
+  auth-service:
+    build:
+      context: ./AuthenticationService
+      dockerfile: Dockerfile
+    container_name: authentication
+    ports:
+      - "8000:8000"  # External access for auth API
+    depends_on:
+      - user-grpc
+    networks:
+      - microservices-network
+
+  # User Service (REST API)
+  user-api:
+    build:
+      context: ./UserService
+      dockerfile: Dockerfile.api
+    container_name: user-api
+    ports:
+      - "8001:8001"  # External access for user API
+    depends_on:
+      - auth-service
+      - user-grpc
+    networks:
+      - microservices-network
+
+  # User Service (gRPC)
+  user-grpc:
+    build:
+      context: ./UserService
+      dockerfile: Dockerfile.grpc
+    container_name: user-grpc
+    ports:
+      - "50051:50051"  # gRPC port
+    networks:
+      - microservices-network
+
+# Create a custom bridge network
+networks:
+  microservices-network:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.20.0.0/16
+
+# Named volumes for data persistence
+volumes:
+  postgres-data:
+    driver: local
