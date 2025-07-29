@@ -19,7 +19,7 @@ async def signup(signup_user: SignupUser, connector=Depends(get_user_service_cli
         print(e.code(), e.details())
         raise StarletteHTTPException(400, 'User Exist')
 
-@router.get("/signin", response_model=Auth)
+@router.post("/signin", response_model=Auth)
 async def signin(signin_user: SigninUser, connector=Depends(get_user_service_client_connoctor)):
     try:
         result = await service.signin_user(connector, signin_user)

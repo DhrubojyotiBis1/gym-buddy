@@ -39,6 +39,30 @@ services:
     networks:
       - microservices-network
 
+  # New Job Request Service
+  new-job-request:
+    build:
+      context: ./NewJobRequestService
+      dockerfile: Dockerfile
+    container_name: new-job-request
+    ports:
+      - "8002:8002" 
+    networks:
+      - microservices-network
+  
+  #Redis Service
+  redis:
+    image: redis:7-alpine
+    container_name: redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+    command: redis-server --appendonly yes
+    networks:
+      - microservices-network
+
 # Create a custom bridge network
 networks:
   microservices-network:
@@ -51,3 +75,6 @@ networks:
 volumes:
   postgres-data:
     driver: local
+  redis-data:
+    driver: local
+    name: redis-production-data

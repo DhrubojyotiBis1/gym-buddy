@@ -22,9 +22,9 @@ class JWT():
         user_info = jwt.decode(token, self.public_key, algorithms=[algorithm])
         return user_info
 
-    def create_new_tokens(self, user_info):
-        access_token = self._generate_token(user_info, Config.JWT_ACCESS_TOKEN_TYPE, timedelta(minutes=Config.JWT_ACCESS_TOKEN_EXP_TIME_IN_MINUTS))
-        refresh_token = self._generate_token(user_info, Config.JWT_REFRESH_TOKEN_TYPE, timedelta(minutes=Config.JWT_REFRESH_TOKEN_EXP_TIME_IN_MINUTS))
+    def create_new_tokens(self, user_email):
+        access_token = self._generate_token(user_email, Config.JWT_ACCESS_TOKEN_TYPE, timedelta(minutes=Config.JWT_ACCESS_TOKEN_EXP_TIME_IN_MINUTS))
+        refresh_token = self._generate_token(user_email, Config.JWT_REFRESH_TOKEN_TYPE, timedelta(minutes=Config.JWT_REFRESH_TOKEN_EXP_TIME_IN_MINUTS))
         #TODO: Insert the refresh token in redis
         return {"access_token": access_token, "refresh_token": refresh_token}
     
@@ -34,4 +34,4 @@ class JWT():
         if "type" not in user_info or user_info["type"] != Config.JWT_REFRESH_TOKEN_TYPE:
             raise StarletteHTTPException(400, 'Invalid Refresh Token')
         #TODO: delete existing refresh token from redis
-        return self.create_new_tokens(user_info)
+        return self.create_new_tokens(user_info['user'])

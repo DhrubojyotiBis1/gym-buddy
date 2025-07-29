@@ -1,7 +1,7 @@
 [[source]]
-name = "pypi"
 url = "https://pypi.org/simple"
 verify_ssl = true
+name = "pypi"
 
 [packages]
 fastapi = "*"
@@ -11,6 +11,7 @@ asyncpg = "*"
 aiosqlite = "*"
 grpcio = "*"
 grpcio-tools = "*"
+redis = {extras = ["hiredis"], version = "*"}
 pyjwt = {extras = ["crypto"], version = "*"}
 aiofiles = "*"
 
