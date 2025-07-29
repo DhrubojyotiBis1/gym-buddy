@@ -1,0 +1,11 @@
+
+
+class Config:
+    USER_GRPC_CLIENT_HOST = "user-grpc"
+    USER_GRPC_CLIENT_PORT = "50051"
+    PRIVATE_KEY_PATH = "private_key.pem"
+    JWT_ALGORITHM = "ES256"
+    JWT_ACCESS_TOKEN_EXP_TIME_IN_MINUTS = 7
+    JWT_REFRESH_TOKEN_EXP_TIME_IN_MINUTS = 21600
+    JWT_ACCESS_TOKEN_TYPE = "access_token"
+    JWT_REFRESH_TOKEN_TYPE = "refresh_token"

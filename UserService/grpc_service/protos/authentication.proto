@@ -1,0 +1,23 @@
+syntax = "proto3";
+package UserAuthenticationService;
+
+
+service UserAuthentication {
+    rpc signup(UserCreate) returns (Response) {}
+    rpc signin(UserCheck) returns (Response) {}
+}
+
+message UserCheck {
+    string email = 2;
+    string hashed_password = 3;
+}
+
+message UserCreate {
+    string name = 1;
+    string email = 2;
+    string hashed_password = 3;
+}
+
+message Response {
+    string message = 1;
+}

@@ -1,0 +1,15 @@
+
+
+
+class Config:
+    REDIS_HOSTNAME = 'localhost'
+    REDIS_PORT = '6379'
+    REDIS_MAX_CONNECTION = 20
+    REDIS_RETRY_ON_TIMEOUT = True
+    REDIS_DECODE_RESPONSE = True
+    REDIS_DB = 0
+    REDIS_SET_KEY = 'SET'
+    REDIS_DETAILS_KEY = 'DETAILS'
+    JWT_ALGORITHM = "ES256"
+    PUBLIC_KEY_PATH = "public_key.pem"
+
