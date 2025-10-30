@@ -11,11 +11,12 @@ new_job_request_service = NewJobRequestService(RedisRepository())
 router = APIRouter(prefix='/new-job-request', tags=['NewJobRequest'])
 
 @router.post('/create-request', response_model=NewJobCreateResponse)
-async def create_request(job_data: JobRequest, user_email: str = Depends(verify_jwt), redis_client = Depends(get_redis_client)):
+async def create_request(job_data: JobRequest, redis_client = Depends(get_redis_client)):
+    user_email = 'test@test.com'
     return await new_job_request_service.create_new_request(user_email, job_data, redis_client)
 
 @router.get("/all", response_model=list[JobResponse])
-async def get_all_jobs(_: str = Depends(verify_jwt), redis_client = Depends(get_redis_client)):
+async def get_all_jobs(redis_client = Depends(get_redis_client)):
     return await new_job_request_service.get_all(redis_client)
 
 @router.get("/", response_model=JobResponse)
