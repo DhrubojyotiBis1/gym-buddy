@@ -50,6 +50,16 @@ services:
     networks:
       - microservices-network
   
+  bid:
+    build: 
+      context: ./BidService
+      dockerfile: Dockerfile
+    container_name: bid
+    ports:
+      - "8003:8003"
+    networks:
+      - microservices-network
+  
   #Redis Service
   redis:
     image: redis:7-alpine
