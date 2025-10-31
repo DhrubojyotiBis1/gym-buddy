@@ -3,7 +3,12 @@ from routers import user_router
 from database import Base, engine
 from exceptions.handlers import register_exception_handlers
 
-app = FastAPI()
+app = FastAPI(
+    title="User Service",
+    docs_url="/user/docs",
+    redoc_url="/user/redoc",
+    openapi_url="/user/openapi.json"
+)
 
 register_exception_handlers(app)
 

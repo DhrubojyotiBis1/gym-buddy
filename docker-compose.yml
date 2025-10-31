@@ -15,11 +15,11 @@ services:
       - microservices-network
 
   # User Service (REST API)
-  user-api:
+  user_api:
     build:
       context: ./UserService
       dockerfile: Dockerfile.api
-    container_name: user-api
+    container_name: user_api
     ports:
       - "8001:8001"  # External access for user API
     depends_on:
@@ -40,11 +40,11 @@ services:
       - microservices-network
 
   # New Job Request Service
-  new-job-request:
+  new_job_request:
     build:
       context: ./NewJobRequestService
       dockerfile: Dockerfile
-    container_name: new-job-request
+    container_name: new_job_request
     ports:
       - "8002:8002" 
     networks:
@@ -70,6 +70,22 @@ services:
     volumes:
       - redis-data:/data
     command: redis-server --appendonly yes
+    networks:
+      - microservices-network
+    
+  api-gateway:
+    build:
+      context: ./APIGatewayService
+      dockerfile: Dockerfile
+    container_name: apigateway
+    ports:
+      - "8080:80"
+    depends_on:
+      - auth-service
+      - user-grpc
+      - new_job_request
+      - bid
+      - redis
     networks:
       - microservices-network
 
