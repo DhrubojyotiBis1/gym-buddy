@@ -15,11 +15,11 @@ services:
       - microservices-network
 
   # User Service (REST API)
-  user-api:
+  user_api:
     build:
       context: ./UserService
       dockerfile: Dockerfile.api
-    container_name: user-api
+    container_name: user_api
     ports:
       - "8001:8001"  # External access for user API
     depends_on:

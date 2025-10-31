@@ -6,7 +6,7 @@ from repositories.user_repository import UserRepository
 from jwt_service.jwt_service import verify_jwt
 from database import get_db
 
-router = APIRouter(prefix="/users", tags=["Users"])
+router = APIRouter(prefix="/user", tags=["Users"])
 user_service = UserService(UserRepository())
 
 '''@router.post("/", response_model=UserResponse)
