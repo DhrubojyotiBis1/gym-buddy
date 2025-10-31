@@ -40,11 +40,11 @@ services:
       - microservices-network
 
   # New Job Request Service
-  new-job-request:
+  new_job_request:
     build:
       context: ./NewJobRequestService
       dockerfile: Dockerfile
-    container_name: new-job-request
+    container_name: new_job_request
     ports:
       - "8002:8002" 
     networks:
@@ -73,7 +73,7 @@ services:
     networks:
       - microservices-network
     
-  apigateway:
+  api-gateway:
     build:
       context: ./APIGatewayService
       dockerfile: Dockerfile
@@ -83,7 +83,7 @@ services:
     depends_on:
       - auth-service
       - user-grpc
-      - new-job-request
+      - new_job_request
       - bid
       - redis
     networks:
