@@ -3,7 +3,12 @@ from fastapi import FastAPI
 from exceptions.handlers import register_exception_handlers
 from fastapi.middleware.cors import CORSMiddleware
 
-app = FastAPI()
+app = FastAPI(
+    title="Authentication Service",
+    docs_url="/authentication/docs",
+    redoc_url="/authentication/redoc",
+    openapi_url="/authentication/openapi.json"
+)
 
 register_exception_handlers(app)
 

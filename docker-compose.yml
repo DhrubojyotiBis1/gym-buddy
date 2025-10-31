@@ -72,6 +72,22 @@ services:
     command: redis-server --appendonly yes
     networks:
       - microservices-network
+    
+  apigateway:
+    build:
+      context: ./APIGatewayService
+      dockerfile: Dockerfile
+    container_name: apigateway
+    ports:
+      - "8080:80"
+    depends_on:
+      - auth-service
+      - user-grpc
+      - new-job-request
+      - bid
+      - redis
+    networks:
+      - microservices-network
 
 # Create a custom bridge network
 networks:
