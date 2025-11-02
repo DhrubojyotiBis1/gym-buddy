@@ -60,6 +60,17 @@ services:
     networks:
       - microservices-network
   
+
+  bid_notifier:
+    build: 
+      context: ./BidNotifierService
+      dockerfile: Dockerfile
+    container_name: bid_notifier
+    ports:
+      - "8004:8004"
+    networks:
+      - microservices-network
+  
   #Redis Service
   redis:
     image: redis:7-alpine

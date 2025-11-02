@@ -63,6 +63,7 @@ class RedisClient:
                     # Atomic block to update the active bid
                     pipe.multi()
                     pipe.set(key, json.dumps(payload))
+                    pipe.publish(key, json.dumps(payload))
                     await pipe.execute()
 
                     return True  
