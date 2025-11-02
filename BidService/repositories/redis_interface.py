@@ -9,4 +9,4 @@ class IRedisRepository(ABC):
     def add_bid(self, bid: BidCreate, redis: RedisClient) -> bool: pass
 
     @abstractmethod
-    def get_all_bids(self, job_id: str, redis: RedisClient) -> dict: pass
+    def get(self, job_id: str, redis: RedisClient) -> dict: pass

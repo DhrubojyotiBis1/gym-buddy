@@ -1,8 +1,8 @@
+import json
 from repositories.redis_interface import IRedisRepository
 from redis_service.redis_client import RedisClient
 from schemas.bid import BidCreate
 from config import Config
-from typing import Optional, Tuple
 
 
 class RedisRepository(IRedisRepository):
@@ -13,6 +13,9 @@ class RedisRepository(IRedisRepository):
 		added = await redis.add(bid.model_dump_json(by_alias=True), key, stream_key)
 		return added
 
-	async def get_all_bids(self, job_id: str, redis: RedisClient):
+	async def get(self, job_id: str, redis: RedisClient):
 		key = f"{job_id}-{Config.REDIS_BIDS_KEY}"
-		return await redis.get_all(key)
+		bid = await redis.get(key)
+		if not bid:
+			return {}
+		return json.loads(bid)

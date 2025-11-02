@@ -10,24 +10,22 @@ class BidService:
 	def __init__(self, redis_repo: IRedisRepository):
 		self.redis_repo = redis_repo
 	
-	async def list_bids(self, job_id: str, redis_client: RedisClient) -> List[BidResponse]:
+	async def get_bid(self, job_id: str, redis_client: RedisClient) -> BidResponse:
 		try:
-			members = await self.redis_repo.get_all_bids(job_id, redis_client)
-			# members are JSON strings stored in the sorted set; map to BidResponse
-			responses: List[BidResponse] = []
-			for m in members:
-				obj = json.loads(m)
-				responses.append(BidResponse(
-					id='',
-					amount=obj.get('amount'),
-					user_id=obj.get('user_id'),
-					job_id=obj.get('job_id'),
-				))
-			return responses
+			member = await self.redis_repo.get(job_id, redis_client)
+			if not member:
+				raise StarletteHTTPException(status_code=404, detail="Bid not found")
+			# member should be a dict at this point
+			return BidResponse(
+				id='',
+				amount=member.get('amount'),
+				user_id=member.get('user_id'),
+				job_id=member.get('job_id'),
+			)
 		except StarletteHTTPException:
 			raise
 		except Exception:
-			raise StarletteHTTPException(status_code=500, detail='Failed to list bids')
+			raise StarletteHTTPException(status_code=500, detail='Failed to get bid')
 	
 	async def create_bid(self, user: str, bid_request: BidRequest, redis_client: RedisClient) -> BidResponse:
 		try:

@@ -5,9 +5,9 @@ from fastapi.middleware.cors import CORSMiddleware
 
 app = FastAPI(
     title="New Job Request Service",
-    docs_url="/new_job_request/docs",
-    redoc_url="/new_job_request/redoc",
-    openapi_url="/new_job_request/openapi.json"
+    docs_url="/new-job-request/docs",
+    redoc_url="/new-job-request/redoc",
+    openapi_url="/new-job-request/openapi.json"
 )
 app.include_router(new_job_request_router.router)
 

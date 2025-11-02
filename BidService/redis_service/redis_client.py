@@ -2,68 +2,93 @@ from redis_service.redis_connector import RedisConnector
 import redis.asyncio as redis
 import time
 import json
-from typing import Optional, Tuple
 from config import Config
 
 
 class RedisClient:
     def __init__(self, connector: RedisConnector):
         self.client = redis.Redis(connection_pool=connector.pool)
-    
-    #TODO: Use lua stript to do the checking 
+
     async def add(self, value: str, key: str, stream_key: str) -> bool:
-        # value is JSON with fields: amount, user_id, job_id
+        """
+        Add a new bid atomically:
+        1. Always produce to stream first
+        2. Reject bid if stream write fails
+        3. Update bid key only if it is lower than the current value
+        4. Atomicity ensured using WATCH/MULTI/EXEC
+        """
         try:
             payload = json.loads(value)
-            amount = float(payload["amount"])  # raises if missing
+            amount = float(payload["amount"])
             user_id = str(payload.get("user_id", ""))
             job_id = str(payload.get("job_id", ""))
         except Exception:
             return False
+
         client = self.client
+
         for _ in range(Config.REDIS_BIDS_RETRY_COUNT):
-            #TODO: First check weather or not the job exist 
-            pipe = client.pipeline(transaction=True)
             try:
-                await pipe.watch(key)
-                lowest = await client.zrange(key, 0, 0, withscores=True)
-                if lowest:
-                    _, lowest_amount = lowest[0]
-                    if amount >= lowest_amount:
+                async with client.pipeline(transaction=True) as pipe:
+                    # TODO: Switch to Lua script for atomic compare-and-set with stream append
+                    await pipe.watch(key)
+
+                    # First, verify if the job key already exists
+                    current_bid = await client.get(key)
+                    if current_bid:
+                        current_data = json.loads(current_bid)
+                        current_amount = float(current_data.get("amount", float("inf")))
+
+                        # Reject if new bid is not better (higher/lower depending on business rule)
+                        if amount >= current_amount:
+                            await pipe.reset()
+                            return False
+
+                    # Add bid entry to stream first (audit + for persistence pipeline)
+                    try:
+                        await client.xadd(
+                            stream_key,
+                            {
+                                "user_id": user_id,
+                                "amount": str(amount),
+                                "job_id": job_id,
+                                "timestamp": str(time.time()),
+                            },
+                        )
+                    except Exception:
+                        # Stream write failed → reject the bid
                         await pipe.reset()
                         return False
-                # Composite score: lower amount first, earlier time wins ties
-                now = time.time()
-                fraction = (now % 1_000_000) / 1_000_000_000_000
-                score = amount + fraction
-                pipe.multi()
-                pipe.xadd(stream_key, {"user_id": user_id, "amount": str(amount), "job_id": job_id})
-                #TODO: Fix store dont add fraction find some other way
-                pipe.zadd(key, {value: score}, nx=True)
-                results = await pipe.execute()
-                if not results:
-                    return False
-                added = bool(results[-1])
-                return added
+
+                    # Atomic block to update the active bid
+                    pipe.multi()
+                    pipe.set(key, json.dumps(payload))
+                    pipe.publish(key, json.dumps(payload))
+                    await pipe.execute()
+
+                    return True  
             except redis.WatchError:
+                # Key was modified before EXEC — retry
                 continue
             finally:
                 await pipe.reset()
+
+        # Failed after retries
         return False
-
-    async def get_all(self, key: str) -> list[str]:
-        members = await self.client.zrange(key, 0, -1)
-        return list(members)
-
-    async def get_top(self, key: str) -> str | None:
-        members = await self.client.zrevrange(key, 0, 0)
-        if not members:
+    
+    async def get(self, key: str) -> str | None:
+        """Retrieve current bid"""
+        try:
+            value = await self.client.get(key)
+            if value is None:
+                return None
+            return value
+        except Exception:
             return None
-        return members[0]
 
 
 connector = RedisConnector()
-        
+
 async def get_redis_client() -> RedisClient:
     return RedisClient(connector)
 

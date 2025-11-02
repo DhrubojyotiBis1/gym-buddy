@@ -8,7 +8,7 @@ from jwt_service.jwt_service import verify_jwt
 
 new_job_request_service = NewJobRequestService(RedisRepository())
 
-router = APIRouter(prefix='/new_job_request', tags=['NewJobRequest'])
+router = APIRouter(prefix='/new-job-request', tags=['NewJobRequest'])
 
 @router.post('/create-request', response_model=NewJobCreateResponse)
 async def create_request(job_data: JobRequest, redis_client = Depends(get_redis_client)):
