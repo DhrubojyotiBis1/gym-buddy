@@ -25,6 +25,7 @@ services:
     depends_on:
       - auth-service
       - user-grpc
+      - postgres
     networks:
       - microservices-network
 
@@ -36,6 +37,8 @@ services:
     container_name: user-grpc
     ports:
       - "50051:50051"  # gRPC port
+    depends_on:
+      - postgres
     networks:
       - microservices-network
 
@@ -46,32 +49,38 @@ services:
       dockerfile: Dockerfile
     container_name: new_job_request
     ports:
-      - "8002:8002" 
+      - "8002:8002"
+    depends_on:
+      - postgres
     networks:
       - microservices-network
-  
+
   bid:
-    build: 
+    build:
       context: ./BidService
       dockerfile: Dockerfile
     container_name: bid
     ports:
       - "8003:8003"
+    depends_on:
+      - redis
+      - postgres
     networks:
       - microservices-network
-  
 
   bid_notifier:
-    build: 
+    build:
       context: ./BidNotifierService
       dockerfile: Dockerfile
     container_name: bid_notifier
     ports:
       - "8004:8004"
+    depends_on:
+      - redis
     networks:
       - microservices-network
-  
-  #Redis Service
+
+  # Redis Service
   redis:
     image: redis:7-alpine
     container_name: redis
@@ -83,7 +92,7 @@ services:
     command: redis-server --appendonly yes
     networks:
       - microservices-network
-    
+
   api-gateway:
     build:
       context: ./APIGatewayService
@@ -97,6 +106,22 @@ services:
       - new_job_request
       - bid
       - redis
+      - user_api
+    networks:
+      - microservices-network
+
+  postgres:
+    image: postgres:14
+    container_name: gym_buddy_postgres
+    ports:
+      - "5432:5432"
+    restart: always
+    environment:
+      POSTGRES_DB: gym_buddy
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    volumes:
+      - postgres-data:/var/lib/postgresql/data/
     networks:
       - microservices-network
 
