@@ -1,0 +1,17 @@
+
+
+
+class Config:
+    REDIS_HOSTNAME = 'redis'
+    REDIS_PORT = '6379'
+    REDIS_MAX_CONNECTION = 20
+    REDIS_RETRY_ON_TIMEOUT = True
+    REDIS_DECODE_RESPONSE = True
+    REDIS_DB = 0
+    REDIS_SET_KEY = 'SET'
+    REDIS_BIDS_KEY = 'BIDS'
+    REDIS_STREAM_KEY = 'STREAM'
+    REDIS_BIDS_RETRY_COUNT = 3
+    JWT_ALGORITHM = "ES256"
+    PUBLIC_KEY_PATH = "public_key.pem"
+
