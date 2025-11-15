@@ -109,6 +109,51 @@ services:
       - user_api
     networks:
       - microservices-network
+  
+  # Redpanda Console (Kafka UI)
+  redpanda-console:
+    image: docker.redpanda.com/redpandadata/console:latest
+    container_name: redpanda-console
+    restart: unless-stopped
+    ports:
+      - "8081:8080"   # External web access (host:container)
+    environment:
+      - KAFKA_BROKERS=kafka:9094           # Use variable assignment format
+      - KAFKA_TLS_ENABLED=false
+      - KAFKA_SASL_ENABLED=false
+      - SERVER_LISTEN_PORT=8080
+      - CONSOLE_LOG_LEVEL=info
+    depends_on:
+      - kafka
+    networks:
+      - microservices-network
+
+  # Kafka (KRaft mode - no Zookeeper)
+  kafka:
+    image: apache/kafka:3.7.0
+    container_name: kafka
+    restart: unless-stopped
+    ports:
+      - "9092:9092"   # external
+      - "9094:9094"   # internal (for docker network)
+    environment:
+      # === KRaft mode (no ZooKeeper) ===
+      KAFKA_NODE_ID: 1
+      KAFKA_PROCESS_ROLES: broker,controller
+      KAFKA_LISTENERS: PLAINTEXT://:9092,CONTROLLER://:9093,INTERNAL://:9094
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://localhost:9092,INTERNAL://kafka:9094
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,CONTROLLER:PLAINTEXT,INTERNAL:PLAINTEXT
+      KAFKA_CONTROLLER_QUORUM_VOTERS: 1@kafka:9093
+      KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER
+      KAFKA_INTER_BROKER_LISTENER_NAME: INTERNAL
+      KAFKA_AUTO_CREATE_TOPICS_ENABLE: "true"
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+    volumes:
+      - kafka-data:/var/lib/kafka/data
+    networks:
+      - microservices-network
 
   postgres:
     image: postgres:14
@@ -140,3 +185,6 @@ volumes:
   redis-data:
     driver: local
     name: redis-production-data
+  kafka-data:
+    driver: local
+    name: kafka-production-data
