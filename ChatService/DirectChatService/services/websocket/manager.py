@@ -1,7 +1,10 @@
 from fastapi import WebSocket
 from typing import Dict
-from connection_services.websocket.websocket_connection_manager_interface import IWebsocketConnectionManager
+from services.websocket.websocket_connection_manager_interface import IWebsocketConnectionManager
 import asyncio
+from logger import get_logger
+
+logger = get_logger()
 
 class WebsocketConnectionManager(IWebsocketConnectionManager):
     """
@@ -24,14 +27,18 @@ class WebsocketConnectionManager(IWebsocketConnectionManager):
         self._initialized = True
 
     async def connect(self, user_id: str, websocket: WebSocket):
-        await websocket.accept()
+        #await websocket.accept()
         async with self._connections_lock:
             self.active_connections[user_id] = websocket
+        logger.info(f"User {user_id} connected via websocket.")
 
     async def disconnect(self, user_id: str):
         async with self._connections_lock:
             if user_id in self.active_connections:
                 self.active_connections.pop(user_id)
+                logger.info(f"User {user_id} disconnected from websocket.")
+            else:
+                logger.warning(f"User {user_id} not found in active connections during disconnect.")
 
     async def send_message_to_user(self, message: str, user_id: str):
         async with self._connections_lock:
@@ -39,5 +46,6 @@ class WebsocketConnectionManager(IWebsocketConnectionManager):
         if websocket:
             try:
                 await websocket.send_text(message)
-            except Exception:
-                pass  # (In prod you might want to log failures.)
+                logger.info(f"Sent message to user {user_id} via websocket.")
+            except Exception as e:
+                logger.error(f"Failed to send message to user {user_id}: {e}")

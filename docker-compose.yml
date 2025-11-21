@@ -79,6 +79,21 @@ services:
       - redis
     networks:
       - microservices-network
+  
+  # Direct Chat Service
+  direct_chat_service:
+    build:
+      context: ./ChatService/DirectChatService
+      dockerfile: Dockerfile
+    container_name: direct_chat_service
+    ports:
+      - "8005:8005"
+    depends_on:
+      - redis
+      - kafka
+      - postgres
+    networks:
+      - microservices-network
 
   # Redis Service
   redis:
