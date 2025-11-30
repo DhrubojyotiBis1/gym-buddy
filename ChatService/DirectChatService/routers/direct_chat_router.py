@@ -32,7 +32,7 @@ async def websocket_endpoint(
     try:
         while True:
             data = await websocket.receive_text()
-            await direct_chat_service.send_message(db, kafka_client, data, user)
+            await direct_chat_service.send_message(db, kafka_client, redis, data, user)
     except WebSocketDisconnect:
         await direct_chat_service.remove_connection(redis, user)
         return Response(status_code=200)

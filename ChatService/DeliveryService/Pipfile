@@ -4,18 +4,13 @@ verify_ssl = true
 name = "pypi"
 
 [packages]
-fastapi = "*"
-uvicorn = {extras = ["standard"], version = "*"}
 sqlalchemy = {extras = ["asyncio"], version = "*"}
 asyncpg = "*"
 aiosqlite = "*"
 grpcio = "*"
 grpcio-tools = "*"
 redis = {extras = ["hiredis"], version = "*"}
-pyjwt = {extras = ["crypto"], version = "*"}
-aiofiles = "*"
 aiokafka = "*"
-mypy-protobuf = "*"
 
 [dev-packages]
 black = "*"

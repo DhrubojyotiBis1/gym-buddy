@@ -21,3 +21,12 @@ class IRedisInterface(ABC):
         Removes a user from the connected set in Redis.
         """
         pass
+
+    @abstractmethod
+    async def get_conversation_id(self, user1: str, user2: str) -> str:
+        """
+        Retrieves the conversation_id for the given two users if it exists in Redis.
+        Returns:
+            str: The conversation_id, or None if not found.
+        """
+        pass

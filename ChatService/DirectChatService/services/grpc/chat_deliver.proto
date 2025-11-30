@@ -1,0 +1,17 @@
+syntax = "proto3";
+package DirectChatService;
+
+
+service DirectChat {
+    rpc SendMessage(DirectChatMessageRequest) returns (Response) {}
+}
+
+message DirectChatMessageRequest {
+    string sender_email = 1;
+    string receiver_email = 2;
+    string message = 3;
+}
+
+message Response {
+    string message = 2;
+}

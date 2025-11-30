@@ -81,13 +81,26 @@ services:
       - microservices-network
   
   # Direct Chat Service
-  direct_chat_service:
+  direct_chat:
     build:
       context: ./ChatService/DirectChatService
       dockerfile: Dockerfile
-    container_name: direct_chat_service
+    container_name: direct_chat
     ports:
       - "8005:8005"
+      - "50052:50052"
+    depends_on:
+      - redis
+      - kafka
+      - postgres
+    networks:
+      - microservices-network
+    
+  delivery:
+    build:
+      context: ./ChatService/DeliveryService
+      dockerfile: Dockerfile
+    container_name: delivery
     depends_on:
       - redis
       - kafka

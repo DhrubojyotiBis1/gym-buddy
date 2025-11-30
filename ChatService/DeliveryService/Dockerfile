@@ -11,8 +11,6 @@ RUN apt-get update \
 RUN pip install --no-cache-dir --upgrade pip
 RUN pip install --no-cache-dir pipenv
 
-COPY ./ /app/
-
 COPY Pipfile Pipfile.lock ./
 
 RUN pipenv install --deploy --system --ignore-pipfile
@@ -23,7 +21,4 @@ RUN adduser --disabled-password --gecos '' appuser
 RUN chown -R appuser:appuser /app
 USER appuser
 
-EXPOSE 8003
-EXPOSE 50052
-
-CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8005"]
+CMD ["python", "main.py"]

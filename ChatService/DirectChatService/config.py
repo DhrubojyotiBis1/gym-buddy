@@ -19,15 +19,18 @@ class Config:
     PUBLIC_KEY_PATH = "public_key.pem"
 
     # -------- Service/Cache Identifiers --------
-    SERVICE_IDENTIFIER = '8005'
-    CONVERSATION_USERS_PREFIX = "directchat:conversation:users:"
-    CONNECTED_USER_PREFIX = "directchat:user:connected_service"
+    SERVICE_HOST = 'direct_chat'
+    SERVICE_PORT = '50052'
+    USERS_CONVERSATION_ID_PREFIX = "participants:conversation_id:"
+    CONVERSATION_ID_USER_PREFIX = "conversation_id:participants:"
+    CONNECTED_USER_PREFIX = "user:service:"
 
     # -------- Kafka Settings --------
     TOPIC_MESSAGES = 'messages'
     TOPIC_STORAGE = 'storage'
     KAFKA_BOOTSTRAP_SERVERS = "kafka:9094"
     KAFKA_CLIENT_ID = "direct-chat-service"
+    KAFKA_TRANSACTION_ID = "test-transaction"
 
     # -------- Database Settings --------
     DB_HOST = "postgres"  
@@ -36,3 +39,6 @@ class Config:
     DB_PASSWORD = "postgres"
     DB_NAME = "gym_buddy"
 
+    # -------- gRPC Settings --------
+    GRPC_IP = "0.0.0.0"
+    GRPC_PORT = "50052"

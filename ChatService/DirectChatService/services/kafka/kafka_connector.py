@@ -7,7 +7,7 @@ logger = get_logger()
 
 class KafkaConnector:
     def __init__(self, bootstrap_servers: str = Config.KAFKA_BOOTSTRAP_SERVERS, 
-    client_id: str = Config.KAFKA_CLIENT_ID, transactional_id: str = Config.SERVICE_IDENTIFIER):
+    client_id: str = Config.KAFKA_CLIENT_ID, transactional_id: str = Config.KAFKA_TRANSACTION_ID):
         self.bootstrap_servers = bootstrap_servers
         self.client_id = client_id
         self._producer = None
