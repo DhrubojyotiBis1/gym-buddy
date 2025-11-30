@@ -2,6 +2,18 @@ version: '3.8'
 
 services:
   # Authentication Service
+  writer-service:
+    build:
+      context: ./WriterService
+      dockerfile: Dockerfile
+    container_name: writer-service
+    ports:
+      - "8006:8006"
+    depends_on:
+      - postgres
+    networks:
+      - microservices-network
+
   auth-service:
     build:
       context: ./AuthenticationService
