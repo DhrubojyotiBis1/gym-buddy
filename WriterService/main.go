@@ -30,7 +30,7 @@ func main() {
 	defer dbPool.CloseDb()
 
 	// Initialize Redis client
-	redisClient, err := redis_client.NewRedisClient()
+	redisClient, err := redis_client.NewRedisClient(rootCtx)
 	if err != nil {
 		log.Fatalf("Failed to initialize Redis client: %v", err)
 	}
@@ -63,20 +63,4 @@ func main() {
 
 	log.Println("Shutting down")
 	kafkaConsumer.Stop()
-
-	// Set up signal handling for graceful shutdown
-
-	// sigChan := make(chan os.Signal, 1)
-	// signal.Notify(sigChan, os.Interrupt, syscall.SIGTERM)
-
-	// // Wait for interrupt signal to gracefully shutdown
-	// <-sigChan
-	// log.Println("Shutting down gracefully...")
-
-	// // Stop Kafka consumer
-	// if err := kafkaConsumer.Stop(); err != nil {
-	// 	log.Printf("Error stopping Kafka consumer: %v", err)
-	// } else {
-	// 	log.Println("Kafka consumer stopped")
-	// }
 }

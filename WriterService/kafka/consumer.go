@@ -81,40 +81,33 @@ func (c *Consumer) Start(topics []string) error {
 	c.wg.Add(1)
 	go func() {
 		defer c.wg.Done()
-		// for {
-		// select {
-		// // case <-c.ctx.Done():
-		// case c.ctx.Err() != nil:
-		// 	log.Println("Consumer context cancelled, stopping...")
-		// 	return
-		// default:
-		// 	handler := &consumerGroupHandler{
-		// 		factory: c.factory,
-		// 	}
+		for {
 
-		// 	err := c.consumerGroup.Consume(c.ctx, topics, handler)
-		// 	if err != nil {
-		// 		log.Printf("Error from consumer: %v", err)
-		// 		return
-		// 	}
-		// }
-		if c.ctx.Err() != nil {
-			log.Println("Consumer context cancelled, stopping...")
-			return
-		}
+			if c.ctx.Err() != nil {
+				log.Println("Consumer context cancelled, stopping...")
+				return
+			}
 
-		handler := &consumerGroupHandler{
-			factory: c.factory,
-		}
+			handler := &consumerGroupHandler{
+				factory: c.factory,
+			}
 
-		// This call blocks while consuming; it will return when
-		// ctx is canceed ollr there is an error / rebalance.
-		if err := c.consumerGroup.Consume(c.ctx, topics, handler); err != nil {
-			log.Printf("Error from consumer: %v", err)
-			// In some setups you might want to continue on some errors and retry.
-			// return
+			// This call blocks while consuming; it will return when
+			// ctx is canceed ollr there is an error / rebalance.
+			if err := c.consumerGroup.Consume(c.ctx, topics, handler); err != nil {
+				log.Printf("Error from consumer: %v", err)
+
+				if c.ctx.Err() != nil {
+					return
+				}
+
+				time.Sleep(5 * time.Second)
+				continue
+				// log.Printf("Error from consumer group connections: %v", err)
+				// In some setups you might want to continue on some errors and retry.
+				// return
+			}
 		}
-		// }
 	}()
 
 	// log.Printf("Started Kafka consumer for topics: %v", topics)
@@ -134,17 +127,20 @@ type consumerGroupHandler struct {
 }
 
 // Setup is run at the beginning of a new session, before ConsumeClaim
-func (h *consumerGroupHandler) Setup(sarama.ConsumerGroupSession) error {
+func (h *consumerGroupHandler) Setup(k sarama.ConsumerGroupSession) error {
+	log.Println("Consumer is successfully connected")
 	return nil
 }
 
 // Cleanup is run at the end of a session, once all ConsumeClaim goroutines have exited
 func (h *consumerGroupHandler) Cleanup(sarama.ConsumerGroupSession) error {
+	log.Println("stopped")
 	return nil
 }
 
 // ConsumeClaim must start a consumer loop of ConsumerGroupClaim's Messages()
 func (h *consumerGroupHandler) ConsumeClaim(session sarama.ConsumerGroupSession, claim sarama.ConsumerGroupClaim) error {
+	log.Println("partition - ", claim.Partition(), ": topic - ", claim.Topic())
 	for {
 		select {
 		case message := <-claim.Messages():
