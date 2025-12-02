@@ -29,7 +29,7 @@ func (rw *RedisWriter) Write(data map[string]interface{}) error {
 	}
 
 	// Generate a key from the data (you can customize this logic)
-	key := fmt.Sprintf("convId:%s", data["convId"])
+	key := fmt.Sprintf("convId:%s", data["conversation_id"])
 	err = rw.client.AddToSortedSet(key, string(jsonData))
 	if err != nil {
 		return fmt.Errorf("failed to write to Redis: %w", err)

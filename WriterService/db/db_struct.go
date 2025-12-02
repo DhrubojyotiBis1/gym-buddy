@@ -6,7 +6,7 @@ import (
 
 type Message struct {
 	ID            uint    `gorm:"primaryKey"`
-	Body          *string `gorm:"type:text"` // nullable
+	Text          *string `gorm:"type:text"` // nullable
 	HasAttachment bool    `gorm:"not null;default:false"`
 	Visible       bool    `gorm:"not null;default:true"`
 
