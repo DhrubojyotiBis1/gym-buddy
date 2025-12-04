@@ -2,6 +2,31 @@ version: '3.8'
 
 services:
   # Authentication Service
+  writer-service:
+    build:
+      context: ./WriterService
+      dockerfile: Dockerfile
+    container_name: writer-service
+    ports:
+      - "8006:8006"
+    depends_on:
+      - postgres
+    networks:
+      - microservices-network
+    environment:
+      - PORT=8006
+      - DB_USERNAME=postgres
+      - DB_PASSWORD=postgres
+      - DB_NAME=gym_buddy
+      - DB_HOST=postgres
+      - DB_PORT=5432
+      - KAFKA_GROUP_ID=writer-service
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - KAFKA_TOPICS=storage,magnus
+      - KAFKA_OFFSET=oldest
+      - KAFKA_BROKERS=kafka:9094
+
   auth-service:
     build:
       context: ./AuthenticationService
